@@ -1,0 +1,67 @@
+{
+    "title": "Game Roles",
+    "desc": "Do you enjoy sitting in front of a screen all day? Like pushing buttons? Fancy some virtual reality? Whatever it is, we've got you covered. Pick a role and other players from the game you choose can easily find you!",
+    "color": "#009127",
+    "roles": [
+        {
+            "name": "Watch_Dogs 1/2",
+            "icon": "🌆",
+            "description": "Watch_Dogs 1 & 2 players - PC platform.",
+            "roleID": "733167245269663794"
+        },
+        {
+            "name": "Watch_Dogs: Legion",
+            "icon": "🤳",
+            "description": "Watch_Dogs: Legion players - cross-platform.",
+            "roleID": "733167383367385144"
+        },
+        {
+            "name": "Tetris Effect: Connected",
+            "icon": "🏵",
+            "description": "Tetris Effect: Connected players - cross-platform.",
+            "roleID": "878752715377901661"
+        },
+        {
+            "name": "Echo Arena / Echo Combat",
+            "icon": "🥏",
+            "description": "Echo Arena/Combat players - Oculus platform.",
+            "roleID": "733167783910703105"
+        },
+        {
+            "name": "Portal 2",
+            "icon": "🧪",
+            "description": "Portal 2 players - cross-platform.",
+            "roleID": "733167591014531153"
+        },
+        {
+            "name": "Minecraft Java",
+            "icon": "⛏",
+            "description": "Minecraft Java players - PC, obviously.",
+            "roleID": "733167494658785310"
+        },
+        {
+            "name": "Minecraft Bedrock",
+            "icon": "🧨",
+            "description": "Minecraft Bedrock players - cross-platform.",
+            "roleID": "946609417363808266"
+        },
+        {
+            "name": "LittleBigPlanet 3",
+            "icon": "🎨",
+            "description": "LittleBigPlanet 3 players - PlayStation 4 platform.",
+            "roleID": "946600461694292039"
+        },
+        {
+            "name": "Toontown: Corporate Clash",
+            "icon": "⚙",
+            "description": "Toontown: Corporate Clash players.",
+            "roleID": "924024751788290048"
+        },
+        {
+            "name": "Toontown Rewritten",
+            "icon": "✏",
+            "description": "Toontown Rewritten players.",
+            "roleID": "924024589527416923"
+        }
+    ]
+}

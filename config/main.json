@@ -1,0 +1,19 @@
+{
+    "userAgent": "FayeBot 1.0.0 Discord.JS",
+    "presence": {
+        "status": "online",
+        "activities": [
+            {
+                "name": "Konohana Kitan",
+                "type": "WATCHING"
+            }
+        ]
+    },
+    "prefix": "faye!",
+    "clientID": "946511909526585445",
+    "adminRoleID": "690343733400830093",
+    "developerID": "374245143655612428",
+    "devGuildID": "377282419838943233",
+    "mainGuildID": "690340526603632661",
+    "presenceUpdateInterval": 1800000
+}

@@ -1,0 +1,15 @@
+{
+  "name": "faye",
+  "version": "1.0.0",
+  "description": "Discord bot for Autumn's Galaxy",
+  "main": "faye.js",
+  "scripts": {
+    "start": "node faye.js"
+  },
+  "author": "Autumn Rivers",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "discord.js": "^13.6.0"
+  }
+}

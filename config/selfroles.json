@@ -1,0 +1,39 @@
+{
+    "title": "Self Roles",
+    "desc": "Really cool roles that you should totally pick up. Most of these can be pinged by staff via Faye, so if you *really* wanna avoid pings, then maybe don't pick up anything from here. Sorry, introverts!",
+    "color": "#54b5ff",
+    "roles": [
+        {
+            "name": "LGBTQIA+",
+            "icon": "🏳️‍🌈",
+            "description": "Members of the LGBTQIA+ community. Cannot be pinged under any circumstance.",
+            "roleID": "690348120953192621"
+        },
+        {
+            "name": "Group Commentators",
+            "icon": "🎤",
+            "description": "People who want to join on group commentary. Can be pinged by staff via Faye.",
+            "roleID": "789709116687908884"
+        },
+        {
+            "name": "Content Pings",
+            "icon": "📹",
+            "description": "Get notified when Autumn starts streaming or uploads a video! Can be pinged by staff via Faye.",
+            "roleID": "946935111285350400",
+            "fayePing": true
+        },
+        {
+            "name": "Project Pings",
+            "icon": "💻",
+            "description": "Get notified when one of Autumn's projects gets updated! Can be pinged by staff via Faye.",
+            "roleID": "946935153303912503",
+            "fayePing": true
+        },
+        {
+            "name": "I Like Pings",
+            "icon": "👍",
+            "description": "Freely pingable role that anyone can use when they want to talk to someone.",
+            "roleID": "946935230047088701"
+        }
+    ]
+}

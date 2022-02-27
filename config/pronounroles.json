@@ -1,0 +1,49 @@
+{
+    "title": "Pronouns Menu",
+    "desc": "How would you prefer to be referred? Select your pronouns in this menu and everyone will know what to call you!",
+    "color": "#bb87ff",
+    "roles": [
+        {
+            "name": "She/Her",
+            "icon": "💜",
+            "description": "For those who prefer to be referred to with she/her pronouns.",
+            "roleID": "690344573536567386"
+        },
+        {
+            "name": "He/Him",
+            "icon": "💙",
+            "description": "For those who prefer to be referred to with he/him pronouns.",
+            "roleID": "690344632894357535"
+        },
+        {
+            "name": "They/Them",
+            "icon": "💛",
+            "description": "For those who prefer to be referred to with they/them pronouns.",
+            "roleID": "690344653127680021"
+        },
+        {
+            "name": "It/Its",
+            "icon": "🖤",
+            "description": "For those who prefer to be referred to with it/its pronouns.",
+            "roleID": "690344679862304909"
+        },
+        {
+            "name": "Fae/Faer",
+            "icon": "💚",
+            "description":"For those who prefer to be referred to with fae/faer pronouns.",
+            "roleID": "715980329030123641"
+        },
+        {
+            "name": "Xe/Xem",
+            "icon": "🧡",
+            "description": "For those who prefer to be referred to with xe/xem pronouns.",
+            "roleID": "715980384642531398"
+        },
+        {
+            "name": "Other / Ask",
+            "icon": "❤",
+            "description": "For those who have pronouns not in this list.",
+            "roleID": "690344707968204807"
+        }
+    ]
+}
