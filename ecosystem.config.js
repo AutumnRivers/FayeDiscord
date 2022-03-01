@@ -4,8 +4,8 @@ module.exports = {
     script: 'faye.js',
     watch: '.'
   }, {
-    script: './service-worker/',
-    watch: ['./service-worker']
+    script: '.',
+    watch: ['.']
   }],
 
   deploy : {
