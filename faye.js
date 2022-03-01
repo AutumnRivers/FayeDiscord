@@ -8,6 +8,7 @@ global.fayeAvatarURL;
 
 // Built-in modules
 const fs = require('fs');
+const http = require('http');
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const presences = require('./config/presences.json');
 
@@ -290,3 +291,8 @@ function handleError(error) {
 };
 
 faye.login(token); // Logs Faye into Discord
+
+http.createServer((req, res) => {
+    res.write("Faye's here to help!");
+    res.end()
+}).listen(process.env.PORT || 80);
