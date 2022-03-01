@@ -24,6 +24,9 @@ At time of writing, Faye uses [NeDB](https://github.com/louischatriot/nedb) for 
 ## Can I invite Faye to my server?
 Unfortunately, no. Faye is built from the ground up to only be used with one specific server. However, the code is here, so you can edit the code to your liking and host your own instance of Faye!
 
+## Is Faye hard to host?
+Nope, in fact, Faye has files making it all ready to go with Heroku! You can deploy it instantly!
+
 ---
 
 ## Setup Requirements
