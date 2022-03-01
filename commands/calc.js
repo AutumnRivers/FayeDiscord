@@ -1,7 +1,8 @@
 const { Constants } = require('discord.js');
 
 const calculate = (content => {
-    const value = new Function('return ' + content)()
+    const value = new Function('return ' + content)();
+    if(typeof value != 'number') return '??? - something went wrong...';
     return value.toString();
 });
 

@@ -68,6 +68,8 @@ async function playWordle(message) {
         var currentGuess = userData.currentGuess;
         var correctArray = userData.correctArray;
         const correctWordArray = correctWord.split('');
+
+        console.log(correctWord);
     
         if(guess == correctWord) {
             wordleGuesses.push(`${correctSquare}${correctSquare}${correctSquare}${correctSquare}${correctSquare}`);
@@ -94,7 +96,6 @@ async function playWordle(message) {
             var fullGuess = '';
             var modifiableCorrectGuess = [...correctWordArray];
             var index = 0;
-            console.log(guessArray);
     
             for(index in guessArray) {
                 var currentLetter = guessArray[index];
@@ -115,6 +116,9 @@ async function playWordle(message) {
                     fullGuess += correctSquare;
                     modifiableCorrectGuess[index] = '0';
                 } else if(modifiableCorrectGuess.includes(currentLetter)) {
+                    var letter = modifiableCorrectGuess.indexOf(currentLetter, index + 1);
+                    if(letter <= -1) letter = modifiableCorrectGuess.indexOf(currentLetter, 0);
+                    if(letter > -1) modifiableCorrectGuess[letter] = '0';
                     fullGuess += closeSquare;
                 } else {
                     fullGuess += wrongSquare;
