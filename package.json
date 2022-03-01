@@ -4,7 +4,7 @@
   "description": "Discord bot for Autumn's Galaxy",
   "main": "faye.js",
   "scripts": {
-    "start": "pm2-runtime start ecosystem.config.js --env production"
+    "start": "node faye.js"
   },
   "author": "Autumn Rivers",
   "license": "MIT",
@@ -12,9 +12,9 @@
   "dependencies": {
     "discord.js": "^13.6.0",
     "mathjs": "^10.1.1",
-    "nedb": "^1.8.0"
+    "nedb": "^1.8.0",
+    "pm2": "^5.2.0"
   },
   "devDependencies": {
-    "pm2": "^5.2.0"
   }
 }

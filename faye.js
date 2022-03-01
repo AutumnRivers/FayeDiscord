@@ -290,3 +290,11 @@ function handleError(error) {
 };
 
 faye.login(token); // Logs Faye into Discord
+
+const pm2 = require('pm2');
+
+pm2.connect(err => {
+    if(err) return console.error(err);
+
+    pm2.start();
+})
