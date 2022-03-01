@@ -1,9 +1,14 @@
 const { Constants } = require('discord.js');
+const math = require('mathjs');
 
 const calculate = (content => {
-    const value = new Function('return ' + content)();
-    if(typeof value != 'number') return '??? - something went wrong...';
-    return value.toString();
+    try {
+        const value = math.evaluate(content);
+        return value.toString();
+    } catch(error) {
+        console.error(error);
+        return '??? - Something went wrong...';
+    }
 });
 
 module.exports = {

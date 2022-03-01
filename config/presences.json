@@ -90,5 +90,17 @@
     {
         "name": "Wish My Life Away by Laura Shigihara",
         "type": "LISTENING"
+    },
+    {
+        "name": "faye!dle",
+        "type": "PLAYING"
+    },
+    {
+        "name": "Making paper airplanes",
+        "type": "CUSTOM"
+    },
+    {
+        "name": "Doing something gay, probably.",
+        "type": "CUSTOM"
     }
 ]

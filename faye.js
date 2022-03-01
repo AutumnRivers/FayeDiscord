@@ -17,7 +17,7 @@ const config = require('./config/main.json');
 const prefix = config.prefix;
 const Intents = Discord.Intents;
 const faye = new Discord.Client({
-    presence: config.presence,
+    presence: presences[Math.floor(Math.random() * presences.length)],
     userAgentSuffix: [
         config.userAgent
     ],
@@ -44,7 +44,6 @@ const token = process.env.FAYE_TOKEN; // This is the Discord bot token
 // Set commands
 const setCommands = async _ => {
     // Register the commands for Faye
-    console.log(commandFiles);
     for (const file of commandFiles) {
         const cmd = require(`./commands/${file}`);
         faye.commands.set(cmd.name, cmd);
@@ -152,6 +151,13 @@ faye.on('interactionCreate', async interaction => {
         memberObject.roles.remove(roleObject, 'User denied terms via Faye with Access command');
 
         interaction.update({ content: "Okay - you won't have access to that channel, then! If this was a mistake, feel free to run the command again.", components: [] });
+    } else if(interaction.customId.startsWith('unban')) {
+        const userID = interaction.customId.split('_')[1];
+        const guildObject = faye.guilds.cache.find(guild => guild.id == config.mainGuildID);
+        const permsArray = interaction.member.permissions.toArray();
+        if(!permsArray.find(perm => perm == 'BAN_MEMBERS')) return interaction.reply({ content: "You can't do that!", ephemeral: true });
+        guildObject.bans.remove(userID, 'Unbanned via Faye undo button');     
+        interaction.reply({ content: 'Unbanned the user!', ephemeral: true });
     }
 })
 
@@ -163,8 +169,7 @@ faye.on('messageCreate', (message) => {
 
     try {
         if(command == 'updatepresence') {
-            const permsArray = message.member.permissions.toArray();
-            if(!permsArray.find(perm => perm == 'ADMINISTRATOR')) {
+            if(message.author.id != config.developerID) {
                 message.reply('🚫 You\'re not allowed to run that command, sorry!')
             } else {
                 forceUpdatePresence();
@@ -174,8 +179,16 @@ faye.on('messageCreate', (message) => {
             if(message.author.id != config.developerID) {
                 return message.reply('🚫 You\'re not allowed to run that command, sorry!');
             } else {
-                faye.application.commands.set([]);
-                message.channel.send('Faye has been restarted!')
+                message.channel.send('Faye is restarting...')
+                process.kill();
+            }
+        } else if(command == 'testgreeting') {
+            if(message.author.id != config.developerID) {
+                return message.reply('🚫 You\'re not allowed to run that command, sorry!');
+            } else {
+                const greeting = fs.readFileSync('./messages/greeting.txt');
+                console.log(greeting);
+                message.member.send(greeting.toString());
             }
         }
 
@@ -190,13 +203,90 @@ faye.on('messageCreate', (message) => {
     }
 });
 
-faye.on('messageReactionAdd', (reaction, user) => {
+faye.on('guildMemberAdd', (member) => {
+    const greeting = fs.readFileSync('./messages/greeting.txt');
+    member.send(greeting.toString());
+});
 
+faye.on('guildMemberRemove', async (member) => {
+    const fetchedLog = await member.guild.fetchAuditLogs({ limit: 1, type: 'MEMBER_KICK' });
+    const kickLog = fetchedLog.entries.first();
+
+    if(!kickLog) return;
+
+    const modUser = kickLog.executor;
+    const user = kickLog.target;
+
+    if(kickLog.createdAt < member.joinedAt) return;
+
+    if(user.id == member.id) {
+        const modlog = member.guild.channels.cache.find(ch => ch.id == config.modlogID);
+
+        const modlogEmbed = new Discord.MessageEmbed()
+        .setColor('#f0f078')
+        .setTitle(`${modUser.tag} just gave a user the boot!`)
+        .setDescription(`🔨 **Banned** ${user.tag}\n🤔 **Reason**: ${kickLog.reason}`)
+        .setFooter({ text: "⚠ This action cannot be undone." });
+
+        modlog.send({ embeds: [modlogEmbed] });
+    }
 })
 
+faye.on('guildBanAdd', async (ban) => {
+    const user = ban.user;
+    const modlog = ban.guild.channels.cache.find(ch => ch.id == config.modlogID);
+    const banLog = await ban.guild.fetchAuditLogs({ type: 'MEMBER_BAN_ADD', limit: 1 });
+    var reason = ban.reason;
+    var modUser;
+
+    const latestBan = banLog.entries.first();
+
+    latestBan ? modUser = latestBan.executor.tag : modUser = 'Somebody...';
+
+    if(!modlog) return console.error('Error! Modlog channel not found :( Panic maybe?');
+    if(!reason) reason = 'No reason specified... oh, the humanity!';
+
+    const modlogEmbed = new Discord.MessageEmbed()
+    .setColor('#d44f4a')
+    .setTitle(`${modUser} just threw down the ban hammer!`)
+    .setDescription(`🔨 **Banned** ${user.tag}\n🤔 **Reason**: ${latestBan.reason}`)
+    .setFooter({ text: "⚠ Was this action a mistake? Push the button below to undo it!" });
+
+    const row = new Discord.MessageActionRow()
+    .addComponents(
+        new Discord.MessageButton()
+        .setCustomId(`unban_${ban.user.id}`)
+        .setLabel(`Unban ${user.username}`)
+        .setStyle('SECONDARY')
+        .setEmoji('⚠')
+    );
+
+    const modlogMsg = await modlog.send({ components: [row], embeds: [modlogEmbed] });
+
+    const msgEditTimeout = setTimeout(() => {
+        modlogMsg.delete();
+        modlogEmbed.footer.text = "⌚ The ability to undo this has timed out.";
+        modlog.send({ embeds: [modlogEmbed], components: [] });
+    }, 600000);
+
+    const filter = interaction => interaction.customId == `unban_${user.id}` && interaction.member.permissions.toArray().includes('BAN_MEMBERS');
+    modlog.awaitMessageComponent({ filter: filter, componentType: 'BUTTON' })
+    .then(interaction => {
+        modlogMsg.delete();
+
+        const editedEmbed = new Discord.MessageEmbed()
+        .setColor('#32a852')
+        .setTitle(`${interaction.user.tag} undid the ban!`)
+        .setDescription(`🤗 **Unbanned** ${user.tag}\n🤔 **Reason**: Undone with Faye`)
+        .setFooter({ text: "⚠ This action can only be undone with Faye." });
+
+        modlog.send({ embeds: [editedEmbed], components: [] });
+        clearTimeout(msgEditTimeout);
+    });
+});
+
 function handleError(error) {
-    //console.error('An error occured with Faye!\n' + error);
-    console.trace(error);
-}
+    console.trace(`An error occured with Faye! Do not worry, it has been caught :)\n${error}`);
+};
 
 faye.login(token); // Logs Faye into Discord

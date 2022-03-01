@@ -1,7 +1,7 @@
-Hello there! My name is Faye, it's great to meet you! I'll be your personal assistant for your time here at Autumn's Galaxy. You can call on me to give you certain roles, do some math, and some other fun stuff.
+Hello there! My name is Faye, it's great to meet you! I'll be your personal assistant for your time here at Autumn's Galaxy. You can call on me to give you certain roles, do some math, and some other fun stuff. I'm always available to help, even in your DMs - if you don't feel comfortable running a command in the server, you can run it here, in your DMs! Nobody will know you ran it. In fact, to preserve privacy, some commands can *only* be ran here in DMs. If you're interested, look at the help command for more information!
 
-I'm always available to help, even in your DMs - if you don't feel comfortable running a command in the server, you can run it here, in your DMs! Nobody will know you ran it. In fact, to preserve privacy, some commands can *only* be ran here in DMs. If you're interested, look at the help command for more information!
+You can also call on me with my prefix - `faye!` or with slash commands, which are built-in to Discord. And if you're ever unsure of what my commands are, you can run `faye!help`.
 
-You can also call on me with my prefix - `faye!` or with slash commands, which are built-in to Discord.
+If you have any feature requests for the bot, you can put them here: https://forms.gle/Ff5RW9Vs1FwHqdGf8
 
 I hope you have a fantastic time here, and I can't wait to spend more time with you!
