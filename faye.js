@@ -37,6 +37,7 @@ const faye = new Discord.Client({
 });
 
 faye.commands = new Discord.Collection(); // Is there a reason this isn't in the documentation? Was it ever in the documentation???
+faye.aliases = new Discord.Collection();
 
 const token = process.env.FAYE_TOKEN; // This is the Discord bot token
 
@@ -49,14 +50,15 @@ const setCommands = async _ => {
         faye.commands.set(cmd.name, cmd);
 
         if(cmd.hideInHelp) continue;
-        global.commands.push({ title: cmd.name, value: cmd.description, example: cmd.example })
+        global.commands.push({ title: cmd.name, value: cmd.description, example: cmd.example, slashName: cmd.slashName })
         if(cmd.disableSlashCommand) continue;
 
         await faye.application.commands.create({
-            name: cmd.name,
+            name: cmd.slashName ? cmd.slashName : cmd.name,
             description: cmd.description,
             options: cmd.options
-        })
+        });
+        faye.aliases.set(cmd.slashName, cmd);
     }
 }
 
@@ -83,7 +85,7 @@ setInterval(forceUpdatePresence, config.presenceUpdateInterval); // Update prese
 
 // Notify that Faye is ready
 faye.on('ready', async () => {
-    setSlashCommands();
+    await setSlashCommands();
     global.fayeGuilds = faye.guilds;
     global.fayeAvatarURL = faye.user.avatarURL();
     console.log('Faye is successfully logged into Discord and ready to roll!');
@@ -93,7 +95,9 @@ faye.on('interactionCreate', async interaction => {
     if(!interaction.isCommand()) return;
 
     try {
-        faye.commands.get(interaction.commandName).executeInteraction(interaction);
+        var commandObj = faye.commands.get(interaction.commandName);
+        if(!commandObj) commandObj = faye.aliases.get(interaction.commandName)
+        commandObj.executeInteraction(interaction);
     } catch(error) {
         interaction.channel.send('There was an error with your command! Do not worry, it has been reported to the developer :)');
         handleError(error);
@@ -191,7 +195,8 @@ faye.on('messageReactionAdd', (reaction, user) => {
 })
 
 function handleError(error) {
-    console.error('An error occured with Faye!\n' + error);
+    //console.error('An error occured with Faye!\n' + error);
+    console.trace(error);
 }
 
 faye.login(token); // Logs Faye into Discord

@@ -8,11 +8,13 @@ function buildEmbed(message) {
 
     for(const command of global.commands) {
         var finalValue = command.value;
-
+        var finalTitle = command.title;
+        
+        if(command.slashName) finalTitle += ' & /' + command.slashName;
         if(command.example) finalValue += `\n\nExample: \`${command.example}\``;
 
         fields.push({
-            name: command.title,
+            name: finalTitle,
             value: finalValue
         })
     }

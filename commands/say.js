@@ -5,6 +5,7 @@ module.exports = {
     description: 'Developer Only - Make Faye say something!',
     options: [],
     disableSlashCommand: true,
+    hideInHelp: true,
     execute(message, args) {
         const config = require(`../config/main.json`);
         if(message.author.id !== config.developerID) return message.reply('🚫 You\'re not allowed to run that command, sorry!');
