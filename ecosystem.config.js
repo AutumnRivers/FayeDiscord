@@ -1,23 +1,19 @@
 module.exports = {
-  apps : [{
-    name: 'faye',
-    script: 'faye.js',
-    watch: '.'
-  }, {
-    script: '.',
-    watch: ['.']
-  }],
-
-  deploy : {
-    production : {
-      user : 'SSH_USERNAME',
-      host : 'SSH_HOSTMACHINE',
-      ref  : 'origin/main',
-      repo : 'GIT_REPOSITORY',
-      path : 'DESTINATION_PATH',
-      'pre-deploy-local': '',
-      'post-deploy' : 'npm install && pm2 reload ecosystem.config.js --env production',
-      'pre-setup': ''
+  apps : [
+    {
+      name: `app-name`,
+      script: 'faye.js',
+      instances: "max",
+      exec_mode: "cluster",
+      env_development: {
+        NODE_ENV: process.env.NODE_ENV
+      },
+      env_staging: {
+        NODE_ENV: process.env.NODE_ENV
+      },
+      env_production: {
+        NODE_ENV: process.env.NODE_ENV
+      }
     }
-  }
+  ],
 };
