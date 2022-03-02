@@ -1,4 +1,5 @@
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js");
+const build = process.env.NODE_ENV == 'dev' ? 'Development' : 'Stable';
 
 function buildEmbed(message) {
     const embedConfig = require('../config/helpembed.json');
@@ -23,7 +24,7 @@ function buildEmbed(message) {
     .setColor(embedConfig.color)
     .setTitle(embedConfig.title)
     .addFields(fields)
-    .setFooter({ text: `Faye v${version} - Official Stable Build`, iconURL: global.fayeAvatarURL });
+    .setFooter({ text: `Faye v${version} - Official ${build} Build`, iconURL: global.fayeAvatarURL });
 
     message.reply({ embeds: [helpEmbed] });
 }

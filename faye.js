@@ -15,7 +15,8 @@ const presences = require('./config/presences.json');
 // Discord.JS
 const Discord = require('discord.js');
 const config = require('./config/main.json');
-const prefix = config.prefix;
+var prefix = config.prefix;
+if(process.env.NODE_ENV == 'dev') prefix = config.devPrefix;
 const Intents = Discord.Intents;
 const faye = new Discord.Client({
     presence: presences[Math.floor(Math.random() * presences.length)],
@@ -89,6 +90,8 @@ faye.on('ready', async () => {
     global.fayeGuilds = faye.guilds;
     global.fayeAvatarURL = faye.user.avatarURL();
     console.log('Faye is successfully logged into Discord and ready to roll!');
+
+    faye.user.id == config.clientID ? console.log('Logged in as stable!') : faye.user.id == config.devClientID ? console.log('Logged in as dev!') : console.log("I'm not sure what I'm logged in as...");
 });
 
 faye.on('interactionCreate', async interaction => {
@@ -163,7 +166,7 @@ faye.on('interactionCreate', async interaction => {
 })
 
 faye.on('messageCreate', (message) => {
-    if(!message.content.startsWith(config.prefix)) return;
+    if(!message.content.startsWith(prefix) || message.author.bot) return;
 
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
@@ -206,7 +209,11 @@ faye.on('messageCreate', (message) => {
 
 faye.on('guildMemberAdd', (member) => {
     const greeting = fs.readFileSync('./messages/greeting.txt');
-    member.send(greeting.toString());
+    try {
+        member.send(greeting.toString());
+    } catch(err) {
+        handleError(err);
+    }
 });
 
 faye.on('guildMemberRemove', async (member) => {
@@ -226,7 +233,7 @@ faye.on('guildMemberRemove', async (member) => {
         const modlogEmbed = new Discord.MessageEmbed()
         .setColor('#f0f078')
         .setTitle(`${modUser.tag} just gave a user the boot!`)
-        .setDescription(`🔨 **Banned** ${user.tag}\n🤔 **Reason**: ${kickLog.reason}`)
+        .setDescription(`🚪 **Kicked** ${user.tag}\n🤔 **Reason**: ${kickLog.reason}`)
         .setFooter({ text: "⚠ This action cannot be undone." });
 
         modlog.send({ embeds: [modlogEmbed] });

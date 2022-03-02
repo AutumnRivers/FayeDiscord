@@ -10,7 +10,9 @@
         ]
     },
     "prefix": "faye!",
+    "devPrefix": "fayed!",
     "clientID": "946511909526585445",
+    "devClientID": "948343033747898428",
     "adminRoleID": "690343733400830093",
     "developerID": "374245143655612428",
     "devGuildID": "377282419838943233",

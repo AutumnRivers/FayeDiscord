@@ -3,6 +3,8 @@ const Database = require('nedb');
 const db = new Database();
 db.loadDatabase();
 
+const build = process.env.NODE_ENV == 'dev' ? 'Development' : 'Stable';
+
 const blankSquare = '🔳';
 const blankRow = blankSquare + blankSquare + blankSquare + blankSquare + blankSquare;
 const wrongSquare = '⬛';
@@ -38,7 +40,7 @@ async function showWordleFirstRun(message, devWord) {
     .setColor('#2C2F33')
     .setTitle('Faye!dle - 0/6')
     .setDescription(`Welcome to Faye!dle! In order to play, just send your guess in this channel. It must be five letters and in the word list. Try to guess the randomly-chosen word in six guesses! You have a time limit of 10 minutes for each guess. Good luck! If you'd like to quit the game, type "quit"\n\n${blankRow}\n${blankRow}\n${blankRow}\n${blankRow}\n${blankRow}\n${blankRow}`)
-    .setFooter({ text: `Faye v${version} - Official Stable Build`, iconURL: global.fayeAvatarURL });
+    .setFooter({ text: `Faye v${version} - Official ${build} Build`, iconURL: global.fayeAvatarURL });
 
     message.reply({ content: 'A game of Faye!dle has been started!', embeds: [wordleEmbed] });
 
@@ -80,7 +82,7 @@ async function playWordle(message) {
             .setColor('#32a852')
             .setTitle(`Faye!dle - ${currentGuess}/6 - Excellent!`)
             .setDescription(`Correct! The word was ${correctWord}!\n\n${allGuesses}`)
-            .setFooter({ text: `Faye v${version} - Official Stable Build`, iconURL: global.fayeAvatarURL });
+            .setFooter({ text: `Faye v${version} - Official ${build} Build`, iconURL: global.fayeAvatarURL });
     
             message.reply({ content: "Say, you're good!", embeds: [winEmbed] });
     
@@ -137,7 +139,7 @@ async function playWordle(message) {
                 .setColor('#bd5751')
                 .setTitle('Faye!dle - X/6 - Better luck next time!')
                 .setDescription(`Argh! You almost had it! Try again? I'm sure you can do it this time!\n\nThe word was ${correctWord}\n\n${allGuesses}`)
-                .setFooter({ text: `Faye v${version} - Official Stable Build`, iconURL: global.fayeAvatarURL });
+                .setFooter({ text: `Faye v${version} - Official ${build} Build`, iconURL: global.fayeAvatarURL });
     
                 message.reply({ content: 'So close!', embeds: [loseEmbed] });
     
@@ -160,7 +162,7 @@ async function playWordle(message) {
                 .setColor('#2C2F33')
                 .setTitle(`Faye!dle - ${currentGuess}/6`)
                 .setDescription(desc)
-                .setFooter({ text: `Faye v${version} - Official Stable Build`, iconURL: global.fayeAvatarURL });
+                .setFooter({ text: `Faye v${version} - Official ${build} Build`, iconURL: global.fayeAvatarURL });
         
                 message.reply({ content: 'Keep going - you got this!', embeds: [guessEmbed] });
     
