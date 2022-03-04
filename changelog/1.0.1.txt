@@ -1,0 +1,5 @@
+- Faye!dle now shows words you've guessed
+- The prefix is no longer case-sensitive
+- Faye!dle guesses are no longer case-sensitive
+- Quitting faye!dle now shows you the correct word
+- New 'changelog' command - woah, deja vu...
