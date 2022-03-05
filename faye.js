@@ -165,7 +165,7 @@ faye.on('interactionCreate', async interaction => {
     }
 })
 
-faye.on('messageCreate', (message) => {
+faye.on('messageCreate', async (message) => {
     if(!message.content.toLowerCase().startsWith(prefix) || message.author.bot) return;
 
     const args = message.content.slice(prefix.length).split(/ +/);
@@ -183,8 +183,8 @@ faye.on('messageCreate', (message) => {
             if(message.author.id != config.developerID) {
                 return message.reply('🚫 You\'re not allowed to run that command, sorry!');
             } else {
-                message.channel.send('Faye is restarting...')
-                process.kill();
+                await message.channel.send('Faye is restarting...')
+                process.kill(process.pid);
             }
         } else if(command == 'testgreeting') {
             if(message.author.id != config.developerID) {

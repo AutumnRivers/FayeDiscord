@@ -19,7 +19,9 @@ Faye is a Discord bot made for [Autumn's Galaxy](https://discord.gg/2w9VTE7) tha
 After changing role IDs and such in the `/config` folder, you should be able to just run `npm start`/`yarn start` and get going!
 
 ## Does Faye require a database?
-At time of writing, Faye uses [NeDB](https://github.com/louischatriot/nedb) for its Wordle feature. However, it's kept in the memory, so there's no database file required.
+At time of writing, Faye uses [NeDB Revived](https://github.com/dills122/nedb) for its Wordle feature. A database file is used for leaderboard purposes. You can make one in `/database/wordle_leaderboards.db`.  
+  
+A database file is also used for the leveling system. Same folder, different file name: `/database/levels.db`
 
 ## Can I invite Faye to my server?
 Unfortunately, no. Faye is built from the ground up to only be used with one specific server. However, the code is here, so you can edit the code to your liking and host your own instance of Faye!

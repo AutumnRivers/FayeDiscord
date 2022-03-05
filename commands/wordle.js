@@ -1,7 +1,12 @@
-const { MessageEmbed } = require("discord.js");
-const Database = require('nedb');
+const { MessageEmbed, Constants } = require("discord.js");
+const Database = require('nedb-revived');
 const db = new Database();
 db.loadDatabase();
+
+const leaderboard = new Database({ filename: './database/wordle_leaderboards.db' });
+leaderboard.loadDatabase();
+
+const fs = require('fs/promises');
 
 const build = process.env.NODE_ENV == 'dev' ? 'Development' : 'Stable';
 
@@ -16,15 +21,18 @@ const answers = require('../wordle/answers.json');
 const version = require('../package.json').version;
 const letters = require('../wordle/letterEmojis');
 
-function dbToAwait(userID) {
+function dbToAwait(userID, dbVar) {
+    if(!dbVar) dbVar = db;
+
     return new Promise(resolve => {
-        db.findOne({ user: userID }, (error, data) => {
+        dbVar.findOne({ user: userID }, (error, data) => {
             resolve(data);
         });
     });
 }
 
-async function showWordleFirstRun(message, devWord) {
+async function showWordleFirstRun(message, devWord, hardMode) {
+    if(!hardMode) hardMode = false;
     const authorID = message.author ? message.author.id : message.member.id;
 
     const userData = await dbToAwait(authorID);
@@ -34,23 +42,30 @@ async function showWordleFirstRun(message, devWord) {
     const lettersArray = [];
     const currentGuess = 0;
     const correctWord = devWord ? devWord : answers[Math.floor(Math.random() * answers.length)];
+    var descriptionPrefix = '';
 
-    db.insert({ user: authorID, correctWord: correctWord, playing: true, currentGuess: currentGuess, wordleGuesses: wordleGuesses, letters: lettersArray, lettersObject: {} });
+    db.insert({ user: authorID, correctWord: correctWord, playing: true, currentGuess: currentGuess, wordleGuesses: wordleGuesses, letters: lettersArray, lettersObject: {}, pointsForGame: 0, correctLetters: [0,0,0,0,0], gotCorrectLetter: false });
+
+    const leaderboardUser = await dbToAwait(authorID, leaderboard);
+
+    if(!leaderboardUser) leaderboard.insert({ user: authorID, points: 0, wins: 0, losses: 0 });
+
+    if(hardMode) descriptionPrefix = "<a:jermaburger:939426724788183053> You're playing hard mode! All guesses must include previous correct answers.\n\n"
 
     const wordleEmbed = new MessageEmbed()
     .setColor('#2C2F33')
     .setTitle('Faye!dle - 0/6')
-    .setDescription(`Welcome to Faye!dle! In order to play, just send your guess in this channel. It must be five letters and in the word list. Try to guess the randomly-chosen word in six guesses! You have a time limit of 10 minutes for each guess. Good luck! If you'd like to quit the game, type "quit"\n\n${blankRow}\n${blankRow}\n${blankRow}\n${blankRow}\n${blankRow}\n${blankRow}`)
+    .setDescription(`${descriptionPrefix}Welcome to Faye!dle! In order to play, just send your guess in this channel. It must be five letters and in the word list. Try to guess the randomly-chosen word in six guesses! You have a time limit of 10 minutes for each guess. Good luck! If you'd like to quit the game, type "quit"\n\n${blankRow}\n${blankRow}\n${blankRow}\n${blankRow}\n${blankRow}\n${blankRow}`)
     .setFooter({ text: `Faye v${version} - Official ${build} Build`, iconURL: global.fayeAvatarURL });
 
     message.reply({ content: 'A game of Faye!dle has been started!', embeds: [wordleEmbed] });
 
     const filter = m => m.author.id == authorID;
     const newGuess = await message.channel.awaitMessages({ filter: filter, max: 1, time: 600000 });
-    playWordle(newGuess.first());
+    playWordle(newGuess.first(), hardMode);
 }
 
-async function playWordle(message) {
+async function playWordle(message, isHardMode) {
     const authorID = message.author ? message.author.id : message.member.id;
 
     const filter = m => m.author.id == authorID;
@@ -58,13 +73,18 @@ async function playWordle(message) {
 
     async function takeGuess() {
         const newGuess = await message.channel.awaitMessages({ filter: filter, max: 1, time: 600000 });
-        playWordle(newGuess.first());
+        playWordle(newGuess.first(), isHardMode);
     }
 
     if(guess == 'quit') {
         const userData = await dbToAwait(authorID);
         var correctWord = userData.correctWord;
-        message.reply('Okay, thanks for playing anyway! In case you were curious, the correct word was ' + correctWord);
+        var points = userData.pointsForGame;
+        if(currentGuess > 0) points -= 150;
+        if(isHardMode && currentGuess > 0) points -= 150;
+        const leaderboardDB = await dbToAwait(authorID, leaderboard);
+        leaderboard.update({ user: authorID }, { $set: { points: leaderboardDB.points + points, losses: leaderboardDB.losses + 1 } });
+        message.reply('Okay, thanks for playing anyway! In case you were curious, the correct word was ' + correctWord + '. You also got a total of ' + points + ' points.');
         db.remove({ user: authorID });
     } else {
         const userData = await dbToAwait(authorID);
@@ -73,7 +93,12 @@ async function playWordle(message) {
         var currentGuess = userData.currentGuess;
         var lettersArray = userData.letters;
         var lettersObject = userData.lettersObject;
-        
+        var points = userData.pointsForGame;
+        var correctLetters = userData.correctLetters;
+        var gotCorrectLetter = userData.gotCorrectLetter;
+
+        var roundPoints = 0;
+
         const correctWordArray = correctWord.split('');
 
         console.log(correctWord);
@@ -83,13 +108,17 @@ async function playWordle(message) {
             currentGuess += 1;
     
             const allGuesses = wordleGuesses.join('\n');
+            points += 250;
+            if(isHardMode) points += 250;
             const winEmbed = new MessageEmbed()
             .setColor('#32a852')
             .setTitle(`Faye!dle - ${currentGuess}/6 - Excellent!`)
-            .setDescription(`Correct! The word was ${correctWord}!\n\n${allGuesses}`)
+            .setDescription(`Correct! The word was ${correctWord}! You've earned ${points} points!\n\n${allGuesses}`)
             .setFooter({ text: `Faye v${version} - Official ${build} Build`, iconURL: global.fayeAvatarURL });
     
             message.reply({ content: "Say, you're good!", embeds: [winEmbed] });
+            const leaderboardDB = await dbToAwait(authorID, leaderboard);
+            leaderboard.update({ user: authorID }, { $set: { points: leaderboardDB.points + points, wins: leaderboardDB.wins + 1 } });
     
             db.remove({ user: authorID });
         } else if(guess.length > 5 || guess.length < 5) {
@@ -103,6 +132,7 @@ async function playWordle(message) {
             var fullGuess = '';
             var modifiableCorrectGuess = [...correctWordArray];
             var index = 0;
+            var perfectGuess = false;
     
             for(index in guessArray) {
                 var currentLetter = guessArray[index];
@@ -123,6 +153,11 @@ async function playWordle(message) {
                     lettersArray.push(currentLetter);
                     fullGuess += correctSquare;
                     modifiableCorrectGuess[index] = '0';
+                    if(correctLetters[index] != currentLetter) points += 125;
+                    if(correctLetters[index] != currentLetter) roundPoints += 125;
+                    perfectGuess = true;
+                    gotCorrectLetter = true;
+                    correctLetters[index] = currentLetter;
                 } else if(modifiableCorrectGuess.includes(currentLetter)) {
                     var letter = modifiableCorrectGuess.indexOf(currentLetter, index + 1);
                     if(letter <= -1) letter = modifiableCorrectGuess.indexOf(currentLetter, 0);
@@ -134,26 +169,37 @@ async function playWordle(message) {
                     fullGuess += wrongSquare;
                 }
             }
+
+            if(!perfectGuess && isHardMode && gotCorrectLetter) message.reply("<:cheems:811387824502472704> You're playing hard mode! Every consecutive guess you make needs to include the previous correct answers! Try guessing again, or... you know, you *could* always quit... 😏");
+            if(!perfectGuess && isHardMode && gotCorrectLetter) return takeGuess();
     
             modifiableCorrectGuess = [...correctWordArray];
 
             fullGuess = fullGuess.split(closeSquare).join(closeSquare + ' ');
             fullGuess = fullGuess.split(correctSquare).join(correctSquare + ' ');
             fullGuess = fullGuess.split(wrongSquare).join(wrongSquare + ' ');
-            db.update({ user: authorID }, { $push: { wordleGuesses: fullGuess }, $set: { currentGuess: currentGuess + 1, letters: lettersArray, lettersObject: lettersObject } });
+
+            if(points > 25) points -= 25;
+            if(points > 25) roundPoints -= 25;
+
+            db.update({ user: authorID }, { $push: { wordleGuesses: fullGuess }, $set: { currentGuess: currentGuess + 1, letters: lettersArray, lettersObject: lettersObject, pointsForGame: points, correctLetters: correctLetters, gotCorrectLetter: gotCorrectLetter } });
             wordleGuesses.push(fullGuess);
             currentGuess += 1;
     
             if(currentGuess >= 6) {
                 const allGuesses = wordleGuesses.join('\n');
+                if(points > 100) points -= 100;
+                if(isHardMode && points > 50) points -= 100;
                 const loseEmbed = new MessageEmbed()
                 .setColor('#bd5751')
                 .setTitle('Faye!dle - X/6 - Better luck next time!')
-                .setDescription(`Argh! You almost had it! Try again? I'm sure you can do it this time!\n\nThe word was ${correctWord}\n\n${allGuesses}`)
+                .setDescription(`Argh! You almost had it! Try again? I'm sure you can do it this time!\n\nThe word was ${correctWord}. But, hey, you got ${points} points this game!\n\n${allGuesses}`)
                 .setFooter({ text: `Faye v${version} - Official ${build} Build`, iconURL: global.fayeAvatarURL });
     
                 message.reply({ content: 'So close!', embeds: [loseEmbed] });
     
+                const leaderboardDB = await dbToAwait(authorID, leaderboard);
+                leaderboard.update({ user: authorID }, { $set: { points: leaderboardDB.points + points, losses: leaderboardDB.losses + 1 } });
                 db.remove({ user: authorID });
             } else {
                 var desc = '';
@@ -175,6 +221,8 @@ async function playWordle(message) {
                     }
                     eval(`lettersObject.row${currentRow}letters = row${currentRow}letters`);
                 }
+
+                desc = roundPoints > 0 ? `+${roundPoints} Points!\n\n` : `${roundPoints} Points...\n\n`;
         
                 for(const [index, guessRow] of wordleGuesses.entries()) {
                     desc += eval(`lettersObject.row${index + 1}letters.join(' ')`);
@@ -202,21 +250,87 @@ async function playWordle(message) {
     }
 }
 
+async function showLeaderboard(message, arg) {
+    const config = require('../config/main.json');
+    const authorID = message.author ? message.author.id : message.member.id;
+    if(authorID == config.developerID && arg == 'reset') fs.writeFile('./database/wordle_leaderboards.db', '');
+    if(authorID == config.developerID && arg == 'reset') return message.reply('Leaderboard reset.');
+
+    leaderboard.find({}, async (err, board) => {
+        if(!board[0]) return message.channel.send("There was an issue loading the Leaderboard! Maybe it was reset?");
+
+        var boardArray = [];
+        var boardArrayFinal = [];
+        var boardArrayParsed = '';
+        var counter = 0;
+
+        while(counter < 10) {
+            var currentEntry = board[counter];
+
+            if(!currentEntry) counter++;
+            if(!currentEntry) continue;
+
+            const guildObject = global.fayeGuilds.cache.find(guild => guild.id == config.mainGuildID);
+            const guildMembers = await guildObject.members.fetch();
+            const memberObject = guildMembers.find(member => member.id == currentEntry.user);
+
+            if(!memberObject) continue;
+
+            boardArray.push({ tag: memberObject.user.tag, points: currentEntry.points });
+            counter++;
+        }
+
+        const boardArraySorted = boardArray.sort((a, b) => { return b.points - a.points });
+        
+        for(const [index, entry] of boardArraySorted.entries()) {
+            boardArrayFinal.push(`${index + 1}. **${entry.tag}** - ${entry.points} points`);
+        }
+
+        boardArrayParsed = boardArrayFinal.join('\n');
+
+        const boardEmbed = new MessageEmbed()
+        .setColor('#ffb700')
+        .setTitle('Faye!dle Leaderboard - Top 10 Players')
+        .setDescription(boardArrayParsed)
+        .setFooter({ text: `Faye v${version} - Official ${build} Build`, iconURL: global.fayeAvatarURL });
+
+        message.reply({ content: "Here are the best Faye!dle gamers!", embeds: [boardEmbed] });
+    });
+}
+
 module.exports = {
     name: 'dle',
     slashName: 'fayedle',
     description: 'Play a game of Faye!dle - Wordle in Discord!',
-    options: [],
+    options: [
+        {
+            name: 'hardmode',
+            description: "Activates hard mode. Every guess needs to include previous correct answers.",
+            required: false,
+            type: Constants.ApplicationCommandOptionTypes.BOOLEAN
+        },
+        {
+            name: 'leaderboard',
+            description: "Whether or not to just show the leaderboard. Nullifies hardmode option.",
+            required: false,
+            type: Constants.ApplicationCommandOptionTypes.BOOLEAN
+        }
+    ],
     disableSlashCommand: false,
     dmOnly: false,
     hideInHelp: false,
     execute(message, args) {
         const config = require(`../config/main.json`);
         var devWord = '';
-        if(message.author.id == config.developerID) devWord = args[0];
-        showWordleFirstRun(message, devWord);
+        var isHardMode = false;
+        if(message.author.id == config.developerID) devWord = args[0] == 'hard' ? args[1] : args[0];
+        if(args[0] == 'leaderboard') return showLeaderboard(message, args[1]);
+        if(args[0] == 'hard') isHardMode = true;
+        showWordleFirstRun(message, devWord, isHardMode);
     },
     executeInteraction(interaction) {
-        showWordleFirstRun(interaction);
+        if(interaction.options.get('leaderboard').value == true) return showLeaderboard(interaction);
+        const hardMode = interaction.options.get('hardmode').value;
+        showWordleFirstRun(interaction, '', hardMode);
     }
 }

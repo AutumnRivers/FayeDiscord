@@ -8,7 +8,7 @@ async function showChangelog(message) {
     const currentVersion = await fs.readFile(`./changelog/${version}.txt`);
 
     const changelogEmbed = new MessageEmbed()
-    .setTitle('Faye Changelog - 1.0.1')
+    .setTitle('Faye Changelog - ' + version)
     .setDescription(currentVersion.toString())
     .setFooter({ text: `Faye v${version} - Official ${build} Build`, iconURL: global.fayeAvatarURL });
 

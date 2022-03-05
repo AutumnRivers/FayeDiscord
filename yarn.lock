@@ -55,6 +55,11 @@
   dependencies:
     "@types/node" "*"
 
+"@yetzt/binary-search-tree@^0.2.6":
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/@yetzt/binary-search-tree/-/binary-search-tree-0.2.6.tgz#91b2d861c089da0bfbeceb5deeca57b81c4210ec"
+  integrity sha512-e/8wt8AAumI8VK5sv09b3IgWuRoblXJ5z0SQYfrL2nap89oKihvVaP1zy3FzD5NaeRi1X0gdXZA9lB3QAZILBg==
+
 async@0.2.10:
   version "0.2.10"
   resolved "https://registry.yarnpkg.com/async/-/async-0.2.10.tgz#b6bbe0b0674b9d719708ca38de8c237cb526c3d1"
@@ -64,13 +69,6 @@ asynckit@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
   integrity sha1-x57Zf380y48robyXkLzDZkdLS3k=
-
-binary-search-tree@0.2.5:
-  version "0.2.5"
-  resolved "https://registry.yarnpkg.com/binary-search-tree/-/binary-search-tree-0.2.5.tgz#7dbb3b210fdca082450dad2334c304af39bdc784"
-  integrity sha1-fbs7IQ/coIJFDa0jNMMErzm9x4Q=
-  dependencies:
-    underscore "~1.4.4"
 
 combined-stream@^1.0.8:
   version "1.0.8"
@@ -166,6 +164,11 @@ localforage@^1.3.0:
   dependencies:
     lie "3.1.1"
 
+lodash@^4.17.21:
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
+  integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
+
 mathjs@^10.1.1:
   version "10.1.1"
   resolved "https://registry.yarnpkg.com/mathjs/-/mathjs-10.1.1.tgz#99b647387b65c4b5c47b71e11d59481473ccfa0d"
@@ -205,16 +208,16 @@ mkdirp@~0.5.1:
   dependencies:
     minimist "^1.2.5"
 
-nedb@^1.8.0:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/nedb/-/nedb-1.8.0.tgz#0e3502cd82c004d5355a43c9e55577bd7bd91d88"
-  integrity sha1-DjUCzYLABNU1WkPJ5VV3vXvZHYg=
+nedb-revived@^1.8.3:
+  version "1.8.3"
+  resolved "https://registry.yarnpkg.com/nedb-revived/-/nedb-revived-1.8.3.tgz#527733f116abdeca228d8da172b6e6309137816f"
+  integrity sha512-s/tu6Sbu3C0anhhRYn1sFWnTm9DG3OYO1/pZyFhxclr8u9VZ8cAs57H0dnXsh5p9sC2oS96Z5DeCr1P7RkgmFg==
   dependencies:
+    "@yetzt/binary-search-tree" "^0.2.6"
     async "0.2.10"
-    binary-search-tree "0.2.5"
     localforage "^1.3.0"
+    lodash "^4.17.21"
     mkdirp "~0.5.1"
-    underscore "~1.4.4"
 
 node-fetch@^2.6.1:
   version "2.6.7"
@@ -257,11 +260,6 @@ typed-function@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/typed-function/-/typed-function-2.0.0.tgz#15ab3825845138a8b1113bd89e60cd6a435739e8"
   integrity sha512-Hhy1Iwo/e4AtLZNK10ewVVcP2UEs408DS35ubP825w/YgSBK1KVLwALvvIG4yX75QJrxjCpcWkzkVRB0BwwYlA==
-
-underscore@~1.4.4:
-  version "1.4.4"
-  resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.4.4.tgz#61a6a32010622afa07963bf325203cf12239d604"
-  integrity sha1-YaajIBBiKvoHljvzJSA88SI51gQ=
 
 webidl-conversions@^3.0.0:
   version "3.0.1"
