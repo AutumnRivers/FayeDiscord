@@ -6,6 +6,8 @@ db.loadDatabase();
 const leaderboard = new Database({ filename: './database/wordle_leaderboards.db' });
 leaderboard.loadDatabase();
 
+leaderboard.persistence.setAutocompactionInterval(config.autoCompactInterval);
+
 const fs = require('fs/promises');
 const leveling = require('../modules/level_system');
 
