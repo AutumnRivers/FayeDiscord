@@ -12,6 +12,9 @@ const http = require('http');
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const presences = require('./config/presences.json');
 
+// Custom modules
+const leveling = require('./modules/level_system');
+
 // Discord.JS
 const Discord = require('discord.js');
 const config = require('./config/main.json');
@@ -166,6 +169,7 @@ faye.on('interactionCreate', async interaction => {
 })
 
 faye.on('messageCreate', async (message) => {
+    if(!message.content.toLowerCase().startsWith(prefix) && !message.author.bot) leveling.levelUser(message); // Only level up user when they're not using Faye
     if(!message.content.toLowerCase().startsWith(prefix) || message.author.bot) return;
 
     const args = message.content.slice(prefix.length).split(/ +/);

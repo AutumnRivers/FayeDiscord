@@ -1,10 +1,12 @@
-- Faye!dle leaderboards! Check em out with `faye!dle leaderboard`
 - Faye!dle hard mode! All guesses must use the correct letters you have. Try it with `faye!dle hard`
 - - Quitting in hard mode loses you 2x the points... so be careful 😉
+- Faye!dle leaderboard pog? <:TenkoHype:690343193665208321> `faye!dle leaderboard`
+- Faye!dle stats pog? <:wthmoment:804042538805231686> `faye!dle stats`
+- Faye!dle arguments help pog? <a:sussyspin:935637542756307036> `faye!dle args`
 - Leveling system pog? <a:drakeclappinggif:949422929257594951>
 - - Leveling up gets you cool stuff like:
 - - Embed/Attachment permissions
 - - Thread creation!
-- - Audit log viewing <:garlicbreadinoven4hourago:939351538437083187>
+- - Modlog viewing <:garlicbreadinoven4hourago:939351538437083187>
 - - And more in the future!
 - View your current level with `faye!level`

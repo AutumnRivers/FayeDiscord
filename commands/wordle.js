@@ -7,6 +7,7 @@ const leaderboard = new Database({ filename: './database/wordle_leaderboards.db'
 leaderboard.loadDatabase();
 
 const fs = require('fs/promises');
+const leveling = require('../modules/level_system');
 
 const build = process.env.NODE_ENV == 'dev' ? 'Development' : 'Stable';
 
@@ -62,6 +63,7 @@ async function showWordleFirstRun(message, devWord, hardMode) {
 
     const filter = m => m.author.id == authorID;
     const newGuess = await message.channel.awaitMessages({ filter: filter, max: 1, time: 600000 });
+    leveling.toggleEarningXP(authorID, false);
     playWordle(newGuess.first(), hardMode);
 }
 
@@ -85,6 +87,7 @@ async function playWordle(message, isHardMode) {
         const leaderboardDB = await dbToAwait(authorID, leaderboard);
         leaderboard.update({ user: authorID }, { $set: { points: leaderboardDB.points + points, losses: leaderboardDB.losses + 1 } });
         message.reply('Okay, thanks for playing anyway! In case you were curious, the correct word was ' + correctWord + '. You also got a total of ' + points + ' points.');
+        leveling.toggleEarningXP(authorID, true);
         db.remove({ user: authorID });
     } else {
         const userData = await dbToAwait(authorID);
@@ -120,6 +123,8 @@ async function playWordle(message, isHardMode) {
             const leaderboardDB = await dbToAwait(authorID, leaderboard);
             leaderboard.update({ user: authorID }, { $set: { points: leaderboardDB.points + points, wins: leaderboardDB.wins + 1 } });
     
+            leveling.toggleEarningXP(authorID, true);
+
             db.remove({ user: authorID });
         } else if(guess.length > 5 || guess.length < 5) {
             message.reply("⚠ Your message isn't the correct length! Are you sure that's five letters?");
@@ -132,7 +137,7 @@ async function playWordle(message, isHardMode) {
             var fullGuess = '';
             var modifiableCorrectGuess = [...correctWordArray];
             var index = 0;
-            var perfectGuess = false;
+            var usesPreviousGuess = 0;
     
             for(index in guessArray) {
                 var currentLetter = guessArray[index];
@@ -155,23 +160,26 @@ async function playWordle(message, isHardMode) {
                     modifiableCorrectGuess[index] = '0';
                     if(correctLetters[index] != currentLetter) points += 125;
                     if(correctLetters[index] != currentLetter) roundPoints += 125;
-                    perfectGuess = true;
+                    if(correctLetters[index] != 0) correctLetters[index] == currentLetter && usesPreviousGuess !== false ? usesPreviousGuess = true : usesPreviousGuess = false;
                     gotCorrectLetter = true;
                     correctLetters[index] = currentLetter;
                 } else if(modifiableCorrectGuess.includes(currentLetter)) {
                     var letter = modifiableCorrectGuess.indexOf(currentLetter, index + 1);
                     if(letter <= -1) letter = modifiableCorrectGuess.indexOf(currentLetter, 0);
                     if(letter > -1) modifiableCorrectGuess[letter] = '0';
+                    if(correctLetters[index] != 0) usesPreviousGuess = false;
                     lettersArray.push(currentLetter);
                     fullGuess += closeSquare;
                 } else {
                     lettersArray.push(currentLetter);
+                    if(correctLetters[index] != 0) usesPreviousGuess = false;
                     fullGuess += wrongSquare;
                 }
             }
 
-            if(!perfectGuess && isHardMode && gotCorrectLetter) message.reply("<:cheems:811387824502472704> You're playing hard mode! Every consecutive guess you make needs to include the previous correct answers! Try guessing again, or... you know, you *could* always quit... 😏");
-            if(!perfectGuess && isHardMode && gotCorrectLetter) return takeGuess();
+            console.log(usesPreviousGuess);
+            if((usesPreviousGuess === false) && isHardMode && gotCorrectLetter) message.reply("<:cheems:811387824502472704> You're playing hard mode! Every consecutive guess you make needs to include the previous correct answers! Try guessing again, or... you know, you *could* always quit... 😏");
+            if(usesPreviousGuess === false && isHardMode && gotCorrectLetter) return takeGuess();
     
             modifiableCorrectGuess = [...correctWordArray];
 
@@ -200,6 +208,7 @@ async function playWordle(message, isHardMode) {
     
                 const leaderboardDB = await dbToAwait(authorID, leaderboard);
                 leaderboard.update({ user: authorID }, { $set: { points: leaderboardDB.points + points, losses: leaderboardDB.losses + 1 } });
+                leveling.toggleEarningXP(authorID, true);
                 db.remove({ user: authorID });
             } else {
                 var desc = '';
@@ -250,11 +259,8 @@ async function playWordle(message, isHardMode) {
     }
 }
 
-async function showLeaderboard(message, arg) {
+async function showLeaderboard(message) {
     const config = require('../config/main.json');
-    const authorID = message.author ? message.author.id : message.member.id;
-    if(authorID == config.developerID && arg == 'reset') fs.writeFile('./database/wordle_leaderboards.db', '');
-    if(authorID == config.developerID && arg == 'reset') return message.reply('Leaderboard reset.');
 
     leaderboard.find({}, async (err, board) => {
         if(!board[0]) return message.channel.send("There was an issue loading the Leaderboard! Maybe it was reset?");
@@ -270,7 +276,7 @@ async function showLeaderboard(message, arg) {
             if(!currentEntry) counter++;
             if(!currentEntry) continue;
 
-            const guildObject = global.fayeGuilds.cache.find(guild => guild.id == config.mainGuildID);
+            const guildObject = message.client.guilds.cache.find(guild => guild.id == config.mainGuildID);
             const guildMembers = await guildObject.members.fetch();
             const memberObject = guildMembers.find(member => member.id == currentEntry.user);
 
@@ -298,6 +304,41 @@ async function showLeaderboard(message, arg) {
     });
 }
 
+async function showStats(message) {
+    const user = await dbToAwait(message.author.id, leaderboard);
+
+    if(!user) return message.reply("You're not registered in the Faye!dle database yet! Play a game, then you can run this command :)");
+
+    const fields = [
+        {
+            name: 'Wins',
+            value: user.wins.toString()
+        },
+        {
+            name: 'Losses/Quits',
+            value: user.losses.toString()
+        },
+        {
+            name: 'Total Score',
+            value: user.points.toString()
+        }
+    ]
+
+    const statsEmbed = new MessageEmbed()
+    .setColor('#ffb700')
+    .setTitle(`${message.author.tag}'s Faye!dle Stats`)
+    .setFields(fields)
+    .setFooter({ text: `Faye v${version} - Official ${build} Build`, iconURL: global.fayeAvatarURL });
+
+    message.reply({ content: 'Here are your stats!', embeds: [statsEmbed] });
+}
+
+function showArgs(message) {
+    const args = "`faye!dle leaderboard` - Shows the global leaderboard. Only shows the top 10 players.\n\n`faye!dle stats` - Shows your personal Faye!dle stats\n\n`faye!dle hard` - Play Faye!dle in hard mode!\n\nIf you ever forget these or they seem overwhelming, you can also use `/fayedle` and the options will show up there!";
+
+    message.reply(args);
+}
+
 module.exports = {
     name: 'dle',
     slashName: 'fayedle',
@@ -314,6 +355,12 @@ module.exports = {
             description: "Whether or not to just show the leaderboard. Nullifies hardmode option.",
             required: false,
             type: Constants.ApplicationCommandOptionTypes.BOOLEAN
+        },
+        {
+            name: 'stats',
+            description: "Looks at your stats instead of anything else. Nullifies all other options.",
+            required: false,
+            type: Constants.ApplicationCommandOptionTypes.BOOLEAN
         }
     ],
     disableSlashCommand: false,
@@ -324,12 +371,14 @@ module.exports = {
         var devWord = '';
         var isHardMode = false;
         if(message.author.id == config.developerID) devWord = args[0] == 'hard' ? args[1] : args[0];
-        if(args[0] == 'leaderboard') return showLeaderboard(message, args[1]);
+        if(args[0] == 'args') return showArgs(message);
+        if(args[0] == 'stats') return showStats(message);
+        if(args[0] == 'leaderboard') return showLeaderboard(message);
         if(args[0] == 'hard') isHardMode = true;
         showWordleFirstRun(message, devWord, isHardMode);
     },
     executeInteraction(interaction) {
-        if(interaction.options.get('leaderboard').value == true) return showLeaderboard(interaction);
+        if(interaction.options.get('leaderboard')) if(interaction.options.get('leaderboard') == true) return showLeaderboard(interaction);
         const hardMode = interaction.options.get('hardmode').value;
         showWordleFirstRun(interaction, '', hardMode);
     }

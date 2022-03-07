@@ -12,7 +12,7 @@ async function showChangelog(message) {
     .setDescription(currentVersion.toString())
     .setFooter({ text: `Faye v${version} - Official ${build} Build`, iconURL: global.fayeAvatarURL });
 
-    message.channel.send({ embeds: [changelogEmbed] });
+    message.reply({ embeds: [changelogEmbed] });
 }
 
 module.exports = {
