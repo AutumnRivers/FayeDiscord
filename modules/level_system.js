@@ -1,6 +1,10 @@
 // Config
 const config = require('../config/main.json');
 
+// FS
+const fs = require('fs');
+if(!fs.existsSync('./database/levels.db')) fs.writeFileSync('./database/levels.db', '');
+
 // Database
 const Database = require('nedb-revived');
 const levels = new Database({ filename: './database/levels.db' });

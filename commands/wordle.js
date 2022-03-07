@@ -4,12 +4,14 @@ const Database = require('nedb-revived');
 const db = new Database();
 db.loadDatabase();
 
+const fs = require('fs');
+if(!fs.existsSync('./database/wordle_leaderboards.db')) fs.writeFileSync('./database/wordle_leaderboards.db', '');
+
 const leaderboard = new Database({ filename: './database/wordle_leaderboards.db' });
 leaderboard.loadDatabase();
 
 leaderboard.persistence.setAutocompactionInterval(config.autoCompactInterval);
 
-const fs = require('fs/promises');
 const leveling = require('../modules/level_system');
 
 const build = process.env.NODE_ENV == 'dev' ? 'Development' : 'Stable';
