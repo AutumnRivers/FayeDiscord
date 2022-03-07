@@ -1,4 +1,5 @@
 const { MessageEmbed, Constants } = require("discord.js");
+const config = require('../config/main.json');
 const Database = require('nedb-revived');
 const db = new Database();
 db.loadDatabase();
@@ -34,9 +35,16 @@ function dbToAwait(userID, dbVar) {
     });
 }
 
+function checkReset() {
+    if(global.resetDatabases['wordle_leaderboards'] == true) leaderboard.loadDatabase();
+    if(global.resetDatabases['wordle_leaderboards'] == true) global.resetDatabases['wordle_leaderboards'] = false;
+}
+
 async function showWordleFirstRun(message, devWord, hardMode) {
     if(!hardMode) hardMode = false;
     const authorID = message.author ? message.author.id : message.member.id;
+
+    checkReset();
 
     const userData = await dbToAwait(authorID);
     if(userData) if(userData.playing) return;
@@ -70,6 +78,8 @@ async function showWordleFirstRun(message, devWord, hardMode) {
 }
 
 async function playWordle(message, isHardMode) {
+    checkReset();
+    
     const authorID = message.author ? message.author.id : message.member.id;
 
     const filter = m => m.author.id == authorID;
@@ -262,6 +272,7 @@ async function playWordle(message, isHardMode) {
 }
 
 async function showLeaderboard(message) {
+    checkReset();
     const config = require('../config/main.json');
 
     leaderboard.find({}, async (err, board) => {
@@ -307,6 +318,7 @@ async function showLeaderboard(message) {
 }
 
 async function showStats(message) {
+    checkReset();
     const user = await dbToAwait(message.author.id, leaderboard);
 
     if(!user) return message.reply("You're not registered in the Faye!dle database yet! Play a game, then you can run this command :)");

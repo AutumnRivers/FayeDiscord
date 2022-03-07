@@ -36,4 +36,6 @@ Nope, in fact, Faye has files making it all ready to go with Heroku! You can dep
 * [Discord.js](https://discord.js.org/) v13+, older versions will *not* work.
 * Node.JS v16+, older versions have not been tested
 
+* Rename each `*_blank.db` file to just `*.db`. (eg, Rename `levels_blank.db` to `levels.db`)
+
 After you've got all that, just run `yarn`/`npm isntall`!

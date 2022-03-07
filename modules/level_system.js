@@ -22,7 +22,13 @@ function dbToAwait(userID) {
     });
 }
 
+function checkReset() {
+    if(global.resetDatabases['levels'] == true) levels.loadDatabase();
+    if(global.resetDatabases['levels'] == true) global.resetDatabases['levels'] = false;
+}
+
 async function checkUser(message) {
+    checkReset();
     const user = await dbToAwait(message.author.id);
 
     const defaultUserObject = {
@@ -43,6 +49,7 @@ async function checkUser(message) {
 }
 
 async function addUserXP(user, client) {
+    checkReset();
     const additionalReqXP = 150 * Math.floor(user.level / 5);
     const nextLevel = (baseLevelXP + (70 * (user.level - 1))) + additionalReqXP;
     const messageXP = Math.floor(Math.random() * (35 - 10 + 1)) + 10;
@@ -76,6 +83,7 @@ async function addUserXP(user, client) {
 }
 
 async function toggleEarningXP(userID, canEarnXP) {
+    checkReset();
     const user = await dbToAwait(userID);
 
     const defaultUserObject = {
@@ -92,6 +100,7 @@ async function toggleEarningXP(userID, canEarnXP) {
 }
 
 async function getUser(userID) {
+    checkReset();
     const user = await dbToAwait(userID);
 
     const defaultUserObject = {

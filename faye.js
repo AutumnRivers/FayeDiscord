@@ -5,6 +5,10 @@ const commandDescs = [];
 global.fayeGuilds;
 global.commands = [];
 global.fayeAvatarURL;
+global.resetDatabases = {
+    "levels": false,
+    "wordle_leaderboards": false
+}
 
 // Built-in modules
 const fs = require('fs');
@@ -52,6 +56,7 @@ const setCommands = async _ => {
     for (const file of commandFiles) {
         const cmd = require(`./commands/${file}`);
         faye.commands.set(cmd.name, cmd);
+        console.log(cmd.name);
 
         if(cmd.hideInHelp) continue;
         global.commands.push({ title: cmd.name, value: cmd.description, example: cmd.example, slashName: cmd.slashName })
