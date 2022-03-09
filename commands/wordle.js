@@ -95,6 +95,7 @@ async function playWordle(message, isHardMode) {
     if(guess == 'quit') {
         const userData = await dbToAwait(authorID);
         var correctWord = userData.correctWord;
+        var currentGuess = userData.currentGuess;
         var points = userData.pointsForGame;
         if(currentGuess > 0) points -= 150;
         if(isHardMode && currentGuess > 0) points -= 150;
