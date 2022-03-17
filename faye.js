@@ -174,7 +174,7 @@ faye.on('interactionCreate', async interaction => {
 })
 
 faye.on('messageCreate', async (message) => {
-    if(!message.content.toLowerCase().startsWith(prefix) && !message.author.bot) leveling.levelUser(message); // Only level up user when they're not using Faye
+    if(!message.content.toLowerCase().startsWith(prefix) && !message.author.bot && message.channel.type !== 'DM') leveling.levelUser(message); // Only level up user when they're not using Faye
     if(!message.content.toLowerCase().startsWith(prefix) || message.author.bot) return;
 
     const args = message.content.slice(prefix.length).split(/ +/);
