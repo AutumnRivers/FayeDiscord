@@ -5,7 +5,7 @@ const version = require('../package.json').version;
 const build = process.env.NODE_ENV == 'dev' ? 'Development' : 'Stable';
 
 async function showLevel(message) {
-    const authorID = message.author ? message.author.id : message.member.id;
+    const authorID = message.author ? message.author.id : message.user.id;
     const discordUser = message.author ? message.author : message.member.user;
     const user = await leveling.getUser(authorID);
 

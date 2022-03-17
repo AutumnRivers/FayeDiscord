@@ -44,7 +44,7 @@ function checkReset() {
 
 async function showWordleFirstRun(message, devWord, hardMode) {
     if(!hardMode) hardMode = false;
-    const authorID = message.author ? message.author.id : message.member.id;
+    const authorID = message.author ? message.author.id : message.user.id;
 
     checkReset();
 
@@ -68,7 +68,7 @@ async function showWordleFirstRun(message, devWord, hardMode) {
     const wordleEmbed = new MessageEmbed()
     .setColor('#2C2F33')
     .setTitle('Faye!dle - 0/6')
-    .setDescription(`${descriptionPrefix}Welcome to Faye!dle! In order to play, just send your guess in this channel. It must be five letters and in the word list. Try to guess the randomly-chosen word in six guesses! You have a time limit of 10 minutes for each guess. Good luck! If you'd like to quit the game, type "quit"\n\n${blankRow}\n${blankRow}\n${blankRow}\n${blankRow}\n${blankRow}\n${blankRow}`)
+    .setDescription(`${descriptionPrefix}Welcome to Faye!dle! In order to play, just send your guess in this channel. It must be five letters and in the word list. Try to guess the randomly-chosen word in six guesses! You have a time limit of 10 minutes for each guess. Good luck! If you'd like to quit the game, type "quit" or "exit"\n\n${blankRow}\n${blankRow}\n${blankRow}\n${blankRow}\n${blankRow}\n${blankRow}`)
     .setFooter({ text: `Faye v${version} - Official ${build} Build`, iconURL: global.fayeAvatarURL });
 
     message.reply({ content: 'A game of Faye!dle has been started!', embeds: [wordleEmbed] });
@@ -82,7 +82,7 @@ async function showWordleFirstRun(message, devWord, hardMode) {
 async function playWordle(message, isHardMode) {
     checkReset();
     
-    const authorID = message.author ? message.author.id : message.member.id;
+    const authorID = message.author ? message.author.id : message.user.id;
 
     const filter = m => m.author.id == authorID;
     const guess = message.content.toLowerCase();
@@ -92,7 +92,7 @@ async function playWordle(message, isHardMode) {
         playWordle(newGuess.first(), isHardMode);
     }
 
-    if(guess == 'quit') {
+    if(guess == 'quit' || guess == 'exit') {
         const userData = await dbToAwait(authorID);
         var correctWord = userData.correctWord;
         var currentGuess = userData.currentGuess;
@@ -396,7 +396,7 @@ module.exports = {
     },
     executeInteraction(interaction) {
         if(interaction.options.get('leaderboard')) if(interaction.options.get('leaderboard') == true) return showLeaderboard(interaction);
-        const hardMode = interaction.options.get('hardmode').value;
+        const hardMode = interaction.options.get('hardmode') ? interaction.options.get('hardmode').value : false;
         showWordleFirstRun(interaction, '', hardMode);
     }
 }
