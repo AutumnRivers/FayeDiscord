@@ -3,5 +3,20 @@
         "name": "lgbtqia",
         "channelID": "690348089844039895",
         "requiredRoles": []
+    },
+    {
+        "name": "autism",
+        "channelID": ["954945695704571954", "954945587059507310"],
+        "requiredRoles": []
+    },
+    {
+        "name": "system",
+        "channelID": ["954945587059507310", "954945817461006377", "954945902454399056"],
+        "requiredRoles": []
+    },
+    {
+        "name": "neurodivergent",
+        "channelID": "954945587059507310",
+        "requiredRoles": []
     }
 ]

@@ -34,6 +34,24 @@
             "icon": "👍",
             "description": "Freely pingable role that anyone can use when they want to talk to someone.",
             "roleID": "946935230047088701"
+        },
+        {
+            "name": "Neurodivergent",
+            "icon": "🦋",
+            "description": "Role for those who have neurological conditions such as autism, ADHD, OCD, etc.",
+            "roleID": "954944719329329172"
+        },
+        {
+            "name": "Autistic",
+            "icon": "♾",
+            "description": "Those who are diagnosed anywhere on the autism spectrum.",
+            "roleID": "954944916910374982"
+        },
+        {
+            "name": "OSDD/DID System",
+            "icon": "👥",
+            "description": "Those who are part of an OSDD/DID system.",
+            "roleID": "954945045306425384"
         }
     ]
 }
