@@ -45,6 +45,8 @@ function checkReset() {
 async function showWordleFirstRun(message, devWord, hardMode) {
     if(!hardMode) hardMode = false;
     const authorID = message.author ? message.author.id : message.user.id;
+    var image = undefined;
+    if(devWord) image = 'https://cdn.discordapp.com/attachments/733168958689116290/956022657080520714/rule69.gif'
 
     checkReset();
 
@@ -69,6 +71,7 @@ async function showWordleFirstRun(message, devWord, hardMode) {
     .setColor('#2C2F33')
     .setTitle('Faye!dle - 0/6')
     .setDescription(`${descriptionPrefix}Welcome to Faye!dle! In order to play, just send your guess in this channel. It must be five letters and in the word list. Try to guess the randomly-chosen word in six guesses! You have a time limit of 10 minutes for each guess. Good luck! If you'd like to quit the game, type "quit" or "exit"\n\n${blankRow}\n${blankRow}\n${blankRow}\n${blankRow}\n${blankRow}\n${blankRow}`)
+    .setImage(image)
     .setFooter({ text: `Faye v${version} - Official ${build} Build`, iconURL: global.fayeAvatarURL });
 
     message.reply({ content: 'A game of Faye!dle has been started!', embeds: [wordleEmbed] });
