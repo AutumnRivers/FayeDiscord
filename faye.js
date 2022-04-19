@@ -175,6 +175,14 @@ faye.on('interactionCreate', async interaction => {
 
 faye.on('messageCreate', async (message) => {
     if(!message.content.toLowerCase().startsWith(prefix) && !message.author.bot && message.channel.type !== 'DM') leveling.levelUser(message); // Only level up user when they're not using Faye
+
+    if(message.author.id == config.developerID && message.reference) {
+        if(!message.embeds[0]) return;
+        if(message.embeds[0].url.endsWith('fayesendthismf.png')) {
+            faye.commands.get('timeout').execute(message);
+        }
+    }
+
     if(!message.content.toLowerCase().startsWith(prefix) || message.author.bot) return;
 
     const args = message.content.slice(prefix.length).split(/ +/);
@@ -218,11 +226,10 @@ faye.on('messageCreate', async (message) => {
 
 faye.on('guildMemberAdd', (member) => {
     const greeting = fs.readFileSync('./messages/greeting.txt');
-    try {
-        member.send(greeting.toString());
-    } catch(err) {
+    member.send(greeting.toString())
+    .catch(err => {
         handleError(err);
-    }
+    })
 });
 
 faye.on('guildMemberRemove', async (member) => {
